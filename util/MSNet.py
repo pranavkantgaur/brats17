@@ -304,52 +304,96 @@ class MSNet(TrainableLayer):
                 b_regularizer=self.regularizers['b'],
                 name='final_pred') 
  
-        f1 = images
+        f1 = images # the forward pass
+	print("structure of input images: ", images.shape)
         f1 = block1_1(f1, is_training)
+        print("structure after block1_1: ", f1.shape)
+
         f1 = block1_2(f1, is_training)
+        print("structure after block1_2: ", f1.shape)
+
         f1 = fuse1(f1, is_training)
+	print("structure after fuse1: ", f1.shape)
         if(self.downsample_twice):
             f1 = downsample1(f1, is_training)
-        if(self.base_chns[0] != self.base_chns[1]):
+            print("structure after downsample1: ", f1.shape)
+
+	if(self.base_chns[0] != self.base_chns[1]):
             f1 = feature_expand1(f1, is_training)
         f1 = block2_1(f1, is_training)
-        f1 = block2_2(f1, is_training)
+        print("structure after block_2_1: ", f1.shape)        
+    	f1 = block2_2(f1, is_training)
+        print("structure after block_2_2: ", f1.shape)        
+
         f1 = fuse2(f1, is_training)
-        
+        print("structure after fuse2: ", f1.shape) 
+
         f2 = downsample2(f1, is_training)
+        print("structure after downsample2: ", f2.shape)        
+
         if(self.base_chns[1] != self.base_chns[2]):
             f2 = feature_expand2(f2, is_training)
         f2 = block3_1(f2, is_training)
+        print("structure after block3_1", f2.shape)        
+
         f2 = block3_2(f2, is_training)
+        print("structure after block_3_2: ", f2.shape)        
+
         f2 = block3_3(f2, is_training)
+        print("structure after block_3_3: ", f2.shape)        
+
         f2 = fuse3(f2, is_training)
-        
+        print("structure after fuse3: ", f2.shape) 
+       
         f3 = f2
         if(self.base_chns[2] != self.base_chns[3]):
             f3 = feature_expand3(f3, is_training) 
+
         f3 = block4_1(f3, is_training)
+        print("structure after block_4_1: ", f3.shape)        
+
         f3 = block4_2(f3, is_training)
+        print("structure after block_4_1: ", f3.shape)        
+
         f3 = block4_3(f3, is_training)
+        print("structure after block_4_3: ", f3.shape)        
+
         f3 = fuse4(f3, is_training)
-        
+        print("structure after fuse4: ", f3.shape) 
+         
         p1 = centra_slice1(f1)
-        if(self.downsample_twice):
-            p1 = pred_up1(p1, is_training)
+       	print("structure after centra_slice1: ", p1.shape) 
+
+	if(self.downsample_twice):
+           print("structure before pred_up1: ", p1.shape) 
+           p1 = pred_up1(p1, is_training)
+	   print("structure fter pred_up1: ", p1.shape) 
+	
         else:
             p1 = pred1(p1)
-         
+        
+	#print("structure after pred_up1: ", p1.shape) 
         p2 = centra_slice2(f2)
+        print("structure after centra_slice2", p2.shape)        
+
         p2 = pred_up2_1(p2, is_training)
+        print("structure after pred_up2_1", p2.shape)
         if(self.downsample_twice):
             p2 = pred_up2_2(p2, is_training)
+	    print("structure after pred_up_2_2", p2.shape)	
         
         p3 = pred_up3_1(f3, is_training)
         if(self.downsample_twice):
             p3 = pred_up3_2(p3, is_training)
 
         cat = tf.concat([p1, p2, p3], axis = 4, name = 'concate')
+        print("structure of concat: ", cat)
         pred = final_pred(cat)
-        return pred
+	print ("structure_of_pred: ", pred.shape)
+	print ("strcture of p1: ", p1.shape)
+        print ("strcture of p2: ", p2.shape)
+	print ("strcture of p3: ", p3.shape)
+	return pred
 
 class ResBlock(TrainableLayer):
     """
