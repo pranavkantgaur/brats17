@@ -122,7 +122,11 @@ def train(config_file):
       padding = "VALID"
       #dilations = 
       # call conv9d to compute convolution of filters over predicty
-      prior_conv.append(tf.nn.conv3d(in_3d, kernel_3d, strides, padding))
+      conv = tf.nn.conv3d(in_3d, kernel_3d, strides, padding)
+      print("shape of prior conv: ", conv.shape)
+      prior_conv.append(conv)
+    prior_conv = tf.stack(prior_conv) # TODO: does it stack all tensors in the list and create a higher dimensional tensor?
+    print("shape of stacked prior_conv", prior_conv.shape)
 
     prior_regularization_parameter = 0.0000005# TODO based on regularization parameter, set value using cross validation
 
@@ -138,8 +142,12 @@ def train(config_file):
     opt_step = tf.train.AdamOptimizer(lr).minimize(loss)
 
 
-
-
+    with tf.Session() as sessionForGraph:
+      writer = tf.summary.FileWriter("output", sessionForGraph.graph)
+      print(sessionForGrah.run())
+      write.close()
+    sessionForGraph.close()
+'''
     sess = tf.InteractiveSession()   
     sess.run(tf.global_variables_initializer())  
     saver = tf.train.Saver()
@@ -179,7 +187,7 @@ def train(config_file):
         if((n+1)%config_train['snapshot_iteration']  == 0): #snapshot of the network
             saver.save(sess, config_train['model_save_prefix']+"_{0:}.ckpt".format(n+1))
     sess.close()
-    
+'''    
 if __name__ == '__main__':
     if(len(sys.argv) != 2):
         print('Number of arguments should be 2. e.g.')
