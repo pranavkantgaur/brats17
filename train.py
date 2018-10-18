@@ -18,7 +18,6 @@ import time
 import os
 import sys
 import tensorflow as tf
-#from tensorflow.contrib.data import Iterator
 from tensorflow.contrib.layers.python.layers import regularizers
 from niftynet.layer.loss_segmentation import LossFunction
 from util.data_loader import *
@@ -103,7 +102,7 @@ def train(config_file):
     in_num_batches = int(in_3d.shape[0])
 
     filter_id = 0
-    in_channels = 1 	# TODO why 2 channels?
+    in_channels = 1 	
     out_channels = 1
     print("input shape is: ", in_3d.shape)
     in_3d = tf.cast(in_3d, tf.float16)
